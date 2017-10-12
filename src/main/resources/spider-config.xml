@@ -9,7 +9,7 @@
         <thread>10</thread>
         <proxy>
             <enable>true</enable>
-            <url>http://localhost</url>
+            <hosts></hosts>
         </proxy>
         <tables>
             <table query="">
