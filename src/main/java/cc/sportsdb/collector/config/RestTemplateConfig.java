@@ -5,7 +5,6 @@ import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.http.client.OkHttp3ClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,7 +17,6 @@ public class RestTemplateConfig {
     private Okhttp3Properties okhttp3Properties;
 
     @Bean
-    @Scope("prototype")
     public RestTemplate restTemplate() {
         return new RestTemplate(okHttp3ClientHttpRequestFactory());
     }

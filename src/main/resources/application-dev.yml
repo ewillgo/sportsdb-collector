@@ -2,4 +2,4 @@ okhttp3:
   readTimeout: 20
   connectTimeout: 20
   maxIdleConnections: 1
-  keepAliveDuration: 5
+  keepAliveDuration: 1
