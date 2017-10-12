@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<spiders>
+    <spider>
+        <id>spider-id</id>
+        <name>xici</name>
+        <url>http://localhost</url>
+        <sql>INSERT INTO table</sql>
+        <thread>10</thread>
+        <proxy>
+            <enable>true</enable>
+            <url>http://localhost</url>
+        </proxy>
+        <tables>
+            <table query="">
+                <columns>
+                    <column name="" query=""/>
+                    <column name="" query=""/>
+                </columns>
+            </table>
+        </tables>
+    </spider>
+</spiders>
