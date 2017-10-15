@@ -1,7 +1,7 @@
 package cc.sportsdb.collector.config;
 
 import cc.sportsdb.collector.spider.SpiderBootstrap;
-import cc.sportsdb.collector.spider.SpiderXmlConfigLoader;
+import cc.sportsdb.collector.spider.loader.SpiderXmlConfigLoader;
 import cc.sportsdb.collector.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.ApplicationContext;

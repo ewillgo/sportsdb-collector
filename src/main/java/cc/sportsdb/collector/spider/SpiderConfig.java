@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 public class SpiderConfig {
 
+    private Boolean enable;
+    private Boolean showLog;
     private String id;
     private String name;
     private String description;
@@ -17,6 +19,31 @@ public class SpiderConfig {
     private DataHandler dataHandler;
     private Proxy proxy;
     private Block[] blocks;
+    private HttpClientConfig httpClientConfig;
+
+    public HttpClientConfig getHttpClientConfig() {
+        return httpClientConfig;
+    }
+
+    public void setHttpClientConfig(HttpClientConfig httpClientConfig) {
+        this.httpClientConfig = httpClientConfig;
+    }
+
+    public Boolean getShowLog() {
+        return showLog;
+    }
+
+    public void setShowLog(Boolean showLog) {
+        this.showLog = showLog;
+    }
+
+    public Boolean getEnable() {
+        return enable;
+    }
+
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
+    }
 
     public Interval getInterval() {
         return interval;
@@ -109,7 +136,9 @@ public class SpiderConfig {
     @Override
     public String toString() {
         return "SpiderConfig{" +
-                "id='" + id + '\'' +
+                "enable=" + enable +
+                ", showLog=" + showLog +
+                ", id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", url='" + url + '\'' +
@@ -120,7 +149,101 @@ public class SpiderConfig {
                 ", dataHandler=" + dataHandler +
                 ", proxy=" + proxy +
                 ", blocks=" + Arrays.toString(blocks) +
+                ", httpClientConfig=" + httpClientConfig +
                 '}';
+    }
+
+    public static class HttpClientConfig {
+        private Interval readTimeout;
+        private Interval connectionTimeout;
+        private Boolean followRedirects;
+        private Boolean followSslRedirects;
+        private Header[] headers;
+
+        public Header[] getHeaders() {
+            return headers;
+        }
+
+        public void setHeaders(Header[] headers) {
+            this.headers = headers;
+        }
+
+        public Interval getReadTimeout() {
+            return readTimeout;
+        }
+
+        public void setReadTimeout(Interval readTimeout) {
+            this.readTimeout = readTimeout;
+        }
+
+        public Interval getConnectionTimeout() {
+            return connectionTimeout;
+        }
+
+        public void setConnectionTimeout(Interval connectionTimeout) {
+            this.connectionTimeout = connectionTimeout;
+        }
+
+        public Boolean getFollowRedirects() {
+            return followRedirects;
+        }
+
+        public void setFollowRedirects(Boolean followRedirects) {
+            this.followRedirects = followRedirects;
+        }
+
+        public Boolean getFollowSslRedirects() {
+            return followSslRedirects;
+        }
+
+        public void setFollowSslRedirects(Boolean followSslRedirects) {
+            this.followSslRedirects = followSslRedirects;
+        }
+
+        @Override
+        public String toString() {
+            return "HttpClientConfig{" +
+                    "readTimeout=" + readTimeout +
+                    ", connectionTimeout=" + connectionTimeout +
+                    ", followRedirects=" + followRedirects +
+                    ", followSslRedirects=" + followSslRedirects +
+                    ", headers=" + Arrays.toString(headers) +
+                    '}';
+        }
+    }
+
+    public static class Header {
+        private String key;
+        private String value;
+
+        public Header(String key, String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "Header{" +
+                    "key='" + key + '\'' +
+                    ", value='" + value + '\'' +
+                    '}';
+        }
     }
 
     public static class Interval {

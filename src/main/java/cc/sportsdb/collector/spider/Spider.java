@@ -44,7 +44,13 @@ public class Spider extends Thread {
     }
 
     private void buildHttpClient() {
-        httpClient = null;
+        httpClient = new OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .readTimeout(config.getHttpClientConfig().getReadTimeout().getInterval(), config.getHttpClientConfig().getReadTimeout().getTimeUnit())
+                .connectTimeout(config.getHttpClientConfig().getConnectionTimeout().getInterval(), config.getHttpClientConfig().getConnectionTimeout().getTimeUnit())
+                .build();
+        ;
     }
 
     public void close() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <spiders>
-    <spider>
+    <spider enable="true" showlog="false">
         <id>xici-proxy</id>
         <name>xici</name>
         <description>Proxy ip collector job</description>
@@ -10,34 +10,16 @@
         <thread>10</thread>
         <interval>60s</interval>
         <level>1</level>
-        <data-handler>
-            <class-name>cc.sportsdb.collector.spider.datahandler.IpProxyHandler</class-name>
-            <thread>10</thread>
-        </data-handler>
-        <proxy>
-            <enable>true</enable>
-            <hosts>http://localhost</hosts>
-        </proxy>
-        <blocks>
-            <block query="#root">
-                <column name="realname" query="#root #realname"/>
-                <column name="age" query="#root #age"/>
-            </block>
-            <block query="#root1">
-                <column name="realname" query="#root1 #realname1"/>
-                <column name="age" query="#root1 #age1"/>
-            </block>
-        </blocks>
-    </spider>
-    <spider>
-        <id>xici-proxy123</id>
-        <name>xici</name>
-        <description>Proxy ip collector job</description>
-        <url>http://localhost</url>
-        <url-pattern>http://localhost$</url-pattern>
-        <thread>10</thread>
-        <interval>60s</interval>
-        <level>1</level>
+        <httpclient>
+            <read-timeout>10s</read-timeout>
+            <connection-timeout>10s</connection-timeout>
+            <follow-redirects>true</follow-redirects>
+            <follow-ssl-redirects>true</follow-ssl-redirects>
+            <headers>
+                <header key="User-Agent" value="auto"/>
+                <header key="Connection" value="close"/>
+            </headers>
+        </httpclient>
         <data-handler>
             <class-name>cc.sportsdb.collector.spider.datahandler.IpProxyHandler</class-name>
             <thread>10</thread>
