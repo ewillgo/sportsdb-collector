@@ -1,27 +1,60 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <spiders>
-
     <spider>
-        <id>spider-id</id>
+        <id>xici-proxy</id>
         <name>xici</name>
-        <discription></discription>
+        <description>Proxy ip collector job</description>
         <url>http://localhost</url>
-        <pattern></pattern>
-        <dataclass></dataclass>
+        <url-pattern>http://localhost$</url-pattern>
         <thread>10</thread>
         <interval>60s</interval>
+        <level>1</level>
+        <data-handler>
+            <class-name>cc.sportsdb.collector.spider.datahandler.IpProxyHandler</class-name>
+            <thread>10</thread>
+        </data-handler>
         <proxy>
             <enable>true</enable>
             <hosts>http://localhost</hosts>
         </proxy>
-        <tables>
-            <table query="">
-                <columns>
-                    <column name="" query=""/>
-                    <column name="" query=""/>
-                </columns>
-            </table>
-        </tables>
+        <blocks>
+            <block query="#root">
+                <column name="realname" query="#root #realname"/>
+                <column name="age" query="#root #age"/>
+            </block>
+            <block query="#root1">
+                <column name="realname" query="#root1 #realname1"/>
+                <column name="age" query="#root1 #age1"/>
+            </block>
+        </blocks>
+    </spider>
+    <spider>
+        <id>xici-proxy123</id>
+        <name>xici</name>
+        <description>Proxy ip collector job</description>
+        <url>http://localhost</url>
+        <url-pattern>http://localhost$</url-pattern>
+        <thread>10</thread>
+        <interval>60s</interval>
+        <level>1</level>
+        <data-handler>
+            <class-name>cc.sportsdb.collector.spider.datahandler.IpProxyHandler</class-name>
+            <thread>10</thread>
+        </data-handler>
+        <proxy>
+            <enable>true</enable>
+            <hosts>http://localhost</hosts>
+        </proxy>
+        <blocks>
+            <block query="#root">
+                <column name="realname" query="#root #realname"/>
+                <column name="age" query="#root #age"/>
+            </block>
+            <block query="#root1">
+                <column name="realname" query="#root1 #realname1"/>
+                <column name="age" query="#root1 #age1"/>
+            </block>
+        </blocks>
     </spider>
 </spiders>

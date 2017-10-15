@@ -8,6 +8,8 @@ public final class SpiderUtil {
 
     public static TimeUnit toTimeUnit(String unit) {
         switch (unit.toLowerCase()) {
+            case "s":
+                return TimeUnit.SECONDS;
             case "m":
                 return TimeUnit.MINUTES;
             case "h":
@@ -15,7 +17,7 @@ public final class SpiderUtil {
             case "d":
                 return TimeUnit.DAYS;
             default:
-                return TimeUnit.SECONDS;
+                throw new IllegalArgumentException("Illegal unit");
         }
     }
 }

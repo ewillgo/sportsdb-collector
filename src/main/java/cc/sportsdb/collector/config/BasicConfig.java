@@ -1,6 +1,6 @@
 package cc.sportsdb.collector.config;
 
-import cc.sportsdb.collector.spider.SpiderControl;
+import cc.sportsdb.collector.spider.SpiderBootstrap;
 import cc.sportsdb.collector.spider.SpiderXmlConfigLoader;
 import cc.sportsdb.collector.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,8 +22,8 @@ public class BasicConfig implements ApplicationContextAware {
     }
 
     @Bean
-    public SpiderControl spiderControl() {
-        return new SpiderControl(new SpiderXmlConfigLoader(applicationContext));
+    public SpiderBootstrap spiderBootstrap() {
+        return new SpiderBootstrap(new SpiderXmlConfigLoader(applicationContext));
     }
 
     @Bean

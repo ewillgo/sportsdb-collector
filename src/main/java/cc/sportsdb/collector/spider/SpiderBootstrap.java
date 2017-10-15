@@ -6,21 +6,21 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SpiderControl {
+public class SpiderBootstrap {
 
     private final Map<String, SpiderConfig> config;
     private final Map<String, Thread[]> threadMap = new LinkedHashMap<>();
-    private static final Logger logger = LoggerFactory.getLogger(SpiderControl.class);
+    private static final Logger logger = LoggerFactory.getLogger(SpiderBootstrap.class);
 
-    public SpiderControl(SpiderConfigLoader loader) {
+    public SpiderBootstrap(SpiderConfigLoader loader) {
         this.config = loader.load();
         init();
     }
 
     private void init() {
-        config.forEach((k, v) -> {
-
-        });
+//        config.forEach((k, v) -> {
+//
+//        });
     }
 
 }
