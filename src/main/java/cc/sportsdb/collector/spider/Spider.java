@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 public class Spider extends Thread {
@@ -24,17 +23,17 @@ public class Spider extends Thread {
     private OkHttpClient httpClient;
     private volatile boolean stopped;
     private final SpiderConfig config;
-    private final BlockingQueue<UrlInfo> queue;
-    private final DataHandler<PageInfo> dataHandler;
+    private final DataQueue<UrlInfo> urlQueue;
+    private final DataQueue<PageInfo> dataQueue;
     private static final Logger logger = LoggerFactory.getLogger(Spider.class);
     private static final SpiderConfig.Interval POLL_TIMEOUT = new SpiderConfig.Interval(5, TimeUnit.SECONDS);
 
-    public Spider(String name, SpiderConfig config, BlockingQueue<UrlInfo> queue, DataHandler<PageInfo> dataHandler) {
+    public Spider(String name, SpiderConfig config, DataQueue<UrlInfo> urlQueue, DataQueue<PageInfo> dataQueue) {
         super(name);
         this.name = name;
-        this.queue = queue;
         this.config = config;
-        this.dataHandler = dataHandler;
+        this.urlQueue = urlQueue;
+        this.dataQueue = dataQueue;
     }
 
     public String getSpiderName() {
@@ -48,7 +47,7 @@ public class Spider extends Thread {
             while (!stopped) {
                 init();
                 UrlInfo urlInfo = null;
-                while (!stopped && (urlInfo = queue.poll(POLL_TIMEOUT.getInterval(), POLL_TIMEOUT.getTimeUnit())) != null) {
+                while (!stopped && (urlInfo = urlQueue.poll(POLL_TIMEOUT.getInterval(), POLL_TIMEOUT.getTimeUnit())) != null) {
 
                     Map<String, String> headerMap = null;
                     SpiderConfig.Header[] headers = config.getHttpClientConfig().getHeaders();
@@ -64,9 +63,12 @@ public class Spider extends Thread {
                         if (response.isSuccessful()) {
                             Document doc = Jsoup.parse(response.body().string());
 
-
                             PageInfo pageInfo = new PageInfo();
-                            dataHandler.handle(pageInfo);
+                            pageInfo.setUrl(urlInfo.getUrl());
+                            pageInfo.setLevel(urlInfo.getLevel());
+                            pageInfo.setTitle(doc.title());
+                            pageInfo.setData(translateBlocks(doc));
+                            dataQueue.put(pageInfo);
 
                             if (urlInfo.getLevel() < config.getLevel() && config.getUrlPattern() != null) {
                                 putMatchUrlToQueue(urlInfo.getLevel(), doc);
@@ -83,8 +85,47 @@ public class Spider extends Thread {
                 config.getInterval().getTimeUnit().sleep(config.getInterval().getInterval());
             }
         } catch (InterruptedException e) {
-            logger.info("Queue interrupted, queue size: {}", queue.size());
+            logger.info("Queue interrupted, queue size: {}", urlQueue.size());
         }
+    }
+
+    private Map<String, String> translateBlocks(Document document) {
+        Map<String, String> data = new LinkedHashMap<>();
+        SpiderConfig.Block[] blocks = config.getBlocks();
+
+        if (blocks == null || blocks.length == 0) {
+            return data;
+        }
+
+        for (SpiderConfig.Block block : blocks) {
+
+            if (block.getColumns() == null || block.getColumns().length == 0) {
+                continue;
+            }
+
+            Elements blockQuery = document.select(block.getQuery());
+
+            if (blockQuery == null || blockQuery.isEmpty()) {
+                continue;
+            }
+
+            Element b = blockQuery.get(0);
+            for (SpiderConfig.Column column : block.getColumns()) {
+
+                if (column.getName() == null || column.getQuery() == null) {
+                    continue;
+                }
+
+                Elements el = b.select(column.getQuery());
+                if (el == null || el.isEmpty()) {
+                    continue;
+                }
+
+                data.put(column.getName(), el.get(0).text());
+            }
+        }
+
+        return data;
     }
 
     private void putMatchUrlToQueue(int level, Document document) throws InterruptedException {
@@ -93,7 +134,7 @@ public class Spider extends Thread {
             for (Element e : elements) {
                 String url = e.absUrl("href");
                 if (RegexUtil.isMatch(config.getUrlPattern(), url)) {
-                    queue.put(new UrlInfo(level + 1, url));
+                    urlQueue.put(new UrlInfo(level + 1, url));
                 }
             }
         }
@@ -101,9 +142,9 @@ public class Spider extends Thread {
 
     private void init() throws InterruptedException {
         httpClient = SpiderUtil.buildHttpClient(config);
-        synchronized (queue) {
-            if (queue.isEmpty()) {
-                queue.put(new UrlInfo(1, config.getUrl()));
+        synchronized (urlQueue) {
+            if (urlQueue.isEmpty()) {
+                urlQueue.put(new UrlInfo(1, config.getUrl()));
             }
         }
     }
