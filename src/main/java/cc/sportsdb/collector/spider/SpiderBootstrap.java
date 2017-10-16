@@ -18,9 +18,10 @@ public class SpiderBootstrap {
     }
 
     private void init() {
-//        config.forEach((k, v) -> {
-//
-//        });
+        config.forEach((k, v) -> {
+            Thread[] threads = new Thread[v.getThread()];
+
+        });
     }
 
 }

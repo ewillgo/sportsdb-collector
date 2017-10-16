@@ -19,11 +19,11 @@ public class HttpClientUtilTest {
         config.setConnectTimeout(20);
         config.setReadTimeout(20);
 
-//        OkHttpClient client = HttpClientUtil.build(config, new Proxy(Proxy.Type.HTTP, new InetSocketAddress("27.40.156.202", 808)));
-        OkHttpClient client = HttpClientUtil.build(config);
+//        OkHttpClient client = HttpUtil.build(config, new Proxy(Proxy.Type.HTTP, new InetSocketAddress("27.40.156.202", 808)));
+        OkHttpClient client = HttpUtil.build(config);
 
         Request request = new Request.Builder()
-                .addHeader("User-Agent", HttpClientUtil.randomUserAgent())
+                .addHeader("User-Agent", HttpUtil.randomUserAgent())
                 .url("http://ip.cn")
                 .get()
                 .build();

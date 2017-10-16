@@ -284,6 +284,22 @@ public class SpiderConfig {
         private Class<?> clazz;
         private Integer thread;
 
+        public Class<?> getClazz() {
+            return clazz;
+        }
+
+        public void setClazz(Class<?> clazz) {
+            this.clazz = clazz;
+        }
+
+        public Integer getThread() {
+            return thread;
+        }
+
+        public void setThread(Integer thread) {
+            this.thread = thread;
+        }
+
         public DataHandler(Integer thread, String className) throws ClassNotFoundException {
             this.thread = thread;
             this.clazz = loadClass(className);

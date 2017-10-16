@@ -4,6 +4,11 @@ public class UrlInfo {
     private int level;
     private String url;
 
+    public UrlInfo(int level, String url) {
+        this.level = level;
+        this.url = url;
+    }
+
     public int getLevel() {
         return level;
     }

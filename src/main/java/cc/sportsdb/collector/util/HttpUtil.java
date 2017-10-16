@@ -2,14 +2,16 @@ package cc.sportsdb.collector.util;
 
 import cc.sportsdb.collector.config.Okhttp3Properties;
 import okhttp3.*;
+import org.springframework.http.HttpMethod;
 
 import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-public final class HttpClientUtil {
+public final class HttpUtil {
 
     public static final String[] USER_AGENTS = {
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36",
@@ -107,7 +109,7 @@ public final class HttpClientUtil {
             "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.59 Safari/537.36"
     };
 
-    private HttpClientUtil() {
+    private HttpUtil() {
     }
 
     public static String randomUserAgent() {
@@ -133,6 +135,46 @@ public final class HttpClientUtil {
 
         if (config.getMaxIdleConnections() > 0) {
             builder.connectionPool(new ConnectionPool(config.getMaxIdleConnections(), config.getKeepAliveDuration(), TimeUnit.MINUTES));
+        }
+
+        return builder.build();
+    }
+
+    public static Request buildPostRequest(String url, Map<String, Object> data) {
+        return buildPostRequest(url, data, null);
+    }
+
+    public static Request buildPostRequest(String url, Map<String, Object> data, Map<String, String> headers) {
+        return buildRequest(HttpMethod.POST, url, data, headers);
+    }
+
+    public static Request buildGetRequest(String url) {
+        return buildGetRequest(url, null);
+    }
+
+    public static Request buildGetRequest(String url, Map<String, String> headers) {
+        return buildRequest(HttpMethod.GET, url, null, headers);
+    }
+
+    public static Request buildRequest(HttpMethod httpMethod, String url, Map<String, Object> data, Map<String, String> headers) {
+        Request.Builder builder = new Request.Builder().url(url);
+
+        if (headers != null && !headers.isEmpty()) {
+            builder.headers(Headers.of(headers));
+        }
+
+        if (httpMethod == HttpMethod.GET) {
+            builder.get();
+        } else if (httpMethod == HttpMethod.POST) {
+            FormBody.Builder formBodyBuilder = new FormBody.Builder();
+
+            if (data != null && !data.isEmpty()) {
+                data.forEach((k, v) -> {
+                    formBodyBuilder.add(k, String.valueOf(v));
+                });
+            }
+
+            builder.post(formBodyBuilder.build());
         }
 
         return builder.build();
