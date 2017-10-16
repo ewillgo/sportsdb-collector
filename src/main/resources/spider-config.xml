@@ -5,10 +5,10 @@
         <id>xici-proxy</id>
         <name>xici</name>
         <description>Proxy ip collector job</description>
-        <url>http://localhost</url>
-        <url-pattern>http://localhost$</url-pattern>
-        <thread>10</thread>
-        <interval>60s</interval>
+        <url>https://www.baidu.com</url>
+        <url-pattern></url-pattern>
+        <thread>1</thread>
+        <interval>2s</interval>
         <level>1</level>
         <httpclient>
             <read-timeout>10s</read-timeout>
@@ -22,20 +22,15 @@
         </httpclient>
         <data-handler>
             <class-name>cc.sportsdb.collector.spider.datahandler.IpProxyHandler</class-name>
-            <thread>10</thread>
+            <thread>1</thread>
         </data-handler>
         <proxy>
-            <enable>true</enable>
+            <enable>false</enable>
             <hosts>http://localhost</hosts>
         </proxy>
         <blocks>
-            <block query="#root">
-                <column name="realname" query="#root #realname"/>
-                <column name="age" query="#root #age"/>
-            </block>
-            <block query="#root1">
-                <column name="realname" query="#root1 #realname1"/>
-                <column name="age" query="#root1 #age1"/>
+            <block query="#u1">
+                <column name="news" query="[name=tj_trnews]"/>
             </block>
         </blocks>
     </spider>

@@ -22,11 +22,14 @@ public class Spider extends Thread {
     private final String name;
     private OkHttpClient httpClient;
     private volatile boolean stopped;
+    private volatile boolean suspended;
     private final SpiderConfig config;
     private final DataQueue<UrlInfo> urlQueue;
     private final DataQueue<PageInfo> dataQueue;
     private static final Logger logger = LoggerFactory.getLogger(Spider.class);
     private static final SpiderConfig.Interval POLL_TIMEOUT = new SpiderConfig.Interval(5, TimeUnit.SECONDS);
+    private static final String USER_AGENT = "User-Agent";
+    private static final String USER_AGENT_AUTO = "auto";
 
     public Spider(String name, SpiderConfig config, DataQueue<UrlInfo> urlQueue, DataQueue<PageInfo> dataQueue) {
         super(name);
@@ -49,12 +52,22 @@ public class Spider extends Thread {
                 UrlInfo urlInfo = null;
                 while (!stopped && (urlInfo = urlQueue.poll(POLL_TIMEOUT.getInterval(), POLL_TIMEOUT.getTimeUnit())) != null) {
 
+                    synchronized (this) {
+                        while (suspended) {
+                            wait();
+                        }
+                    }
+
                     Map<String, String> headerMap = null;
                     SpiderConfig.Header[] headers = config.getHttpClientConfig().getHeaders();
                     if (headers != null && headers.length > 0) {
                         headerMap = new LinkedHashMap<>();
                         for (SpiderConfig.Header header : headers) {
-                            headerMap.put(header.getKey(), header.getValue());
+                            if (USER_AGENT.equalsIgnoreCase(header.getKey()) && USER_AGENT_AUTO.equalsIgnoreCase(header.getValue())) {
+                                headerMap.put(header.getKey(), HttpUtil.randomUserAgent());
+                            } else {
+                                headerMap.put(header.getKey(), header.getValue());
+                            }
                         }
                     }
 
@@ -70,6 +83,8 @@ public class Spider extends Thread {
                             pageInfo.setData(translateBlocks(doc));
                             dataQueue.put(pageInfo);
 
+                            logger.info("page info: {}", pageInfo.toString());
+
                             if (urlInfo.getLevel() < config.getLevel() && config.getUrlPattern() != null) {
                                 putMatchUrlToQueue(urlInfo.getLevel(), doc);
                             }
@@ -80,9 +95,8 @@ public class Spider extends Thread {
                         logger.error(e.getMessage(), e);
                     }
 
+                    config.getInterval().getTimeUnit().sleep(config.getInterval().getInterval());
                 }
-
-                config.getInterval().getTimeUnit().sleep(config.getInterval().getInterval());
             }
         } catch (InterruptedException e) {
             logger.info("Queue interrupted, queue size: {}", urlQueue.size());
@@ -141,7 +155,11 @@ public class Spider extends Thread {
     }
 
     private void init() throws InterruptedException {
-        httpClient = SpiderUtil.buildHttpClient(config);
+        synchronized (this) {
+            if (httpClient == null) {
+                httpClient = SpiderUtil.buildHttpClient(config);
+            }
+        }
         synchronized (urlQueue) {
             if (urlQueue.isEmpty()) {
                 urlQueue.put(new UrlInfo(1, config.getUrl()));
@@ -151,5 +169,15 @@ public class Spider extends Thread {
 
     public void close() {
         stopped = true;
+        spiderResume();
+    }
+
+    public synchronized void spiderSuspend() {
+        suspended = true;
+    }
+
+    public synchronized void spiderResume() {
+        suspended = false;
+        notifyAll();
     }
 }

@@ -1,6 +1,6 @@
 package cc.sportsdb.collector.service;
 
-import cc.sportsdb.collector.spider.SpiderBootstrap;
+import cc.sportsdb.collector.spider.SpiderMonitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -8,8 +8,7 @@ import org.springframework.stereotype.Service;
 public class SpiderService {
 
     @Autowired
-    private SpiderBootstrap spiderBootstrap;
-
+    private SpiderMonitor spiderMonitor;
 
 
 }

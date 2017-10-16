@@ -4,6 +4,10 @@ import cc.sportsdb.collector.config.Okhttp3Properties;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.junit.Test;
 import org.slf4j.LoggerFactory;
 
@@ -24,11 +28,18 @@ public class HttpClientUtilTest {
 
         Request request = new Request.Builder()
                 .addHeader("User-Agent", HttpUtil.randomUserAgent())
-                .url("http://ip.cn")
+                .url("https://www.baidu.com")
                 .get()
                 .build();
 
         Response response = client.newCall(request).execute();
-        logger.info("{}", response.body().string());
+
+        Document doc = Jsoup.parse(response.body().string());
+        Elements elements = doc.select("#u1");
+        Elements nav = elements.select("[name=tj_trnews]");
+        logger.info("{}", nav.text());
+
+
+//        logger.info("{}", response.body().string());
     }
 }

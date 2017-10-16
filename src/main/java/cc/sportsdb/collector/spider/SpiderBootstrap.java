@@ -10,29 +10,44 @@ import java.util.Map;
 public class SpiderBootstrap {
 
     private final Map<String, SpiderConfig> config;
+    private final SpiderMonitor spiderMonitor;
     private final Map<String, Thread[]> threadMap = new LinkedHashMap<>();
     private static final Logger logger = LoggerFactory.getLogger(SpiderBootstrap.class);
 
-    public SpiderBootstrap(SpiderConfigLoader loader) {
+    public SpiderBootstrap(SpiderConfigLoader loader, SpiderMonitor spiderMonitor) {
         this.config = loader.load();
+        this.spiderMonitor = spiderMonitor;
         init();
+        start();
     }
 
     public void start() {
+        if (spiderMonitor == null) {
+            return;
+        }
 
+        spiderMonitor.map().forEach((k, v) -> {
+            v.urlMap().forEach((urlKey, urlValue) -> {
+                urlValue.start();
+            });
+            v.dataMap().forEach((dataKey, dataValue) -> {
+                dataValue.start();
+            });
+        });
     }
 
     private void init() {
         config.forEach((k, v) -> {
             DataQueue<UrlInfo> urlQueue = new DefaultDataQueue<>();
             DataQueue<PageInfo> dataQueue = new DefaultDataQueue<>();
-            Thread[] urlThreads = new Thread[v.getThread()];
-            for (int i = 0; i < urlThreads.length; i++) {
-                urlThreads[i] = new Spider(v.getName(), v, urlQueue, dataQueue);
+            SpiderMonitor.SpiderInfo spiderInfo = new SpiderMonitor.SpiderInfo(v, urlQueue, dataQueue);
+
+            for (int i = 0; i < v.getThread(); i++) {
+                Spider spider = new Spider(v.getName(), v, urlQueue, dataQueue);
+                spiderInfo.putUrlThread(spider.getName(), spider);
             }
 
-            Thread[] handlerThreads = new Thread[v.getDataHandler().getThread()];
-            for (int j = 0; j < handlerThreads.length; ++j) {
+            for (int j = 0; j < v.getDataHandler().getThread(); ++j) {
                 Object dataHandler = null;
 
                 try {
@@ -42,11 +57,14 @@ public class SpiderBootstrap {
                     }
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
-                    continue;
+                    break;
                 }
 
-                handlerThreads[j] = (Thread) dataHandler;
+                Thread tmpThread = (Thread) dataHandler;
+                spiderInfo.putDataThread(tmpThread.getName(), tmpThread);
             }
+
+            spiderMonitor.put(k, spiderInfo);
         });
     }
 

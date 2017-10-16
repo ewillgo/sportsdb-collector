@@ -27,7 +27,7 @@ public class DefaultDataQueue<T> implements DataQueue<T> {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return queue.isEmpty();
     }
 
     @Override
