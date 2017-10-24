@@ -22,10 +22,10 @@ public class BasicConfig implements ApplicationContextAware {
         return new MappingJackson2HttpMessageConverter(JsonUtil.OBJECT_MAPPER);
     }
 
-    @Bean
-    public SpiderBootstrap spiderBootstrap() {
-        return new SpiderBootstrap(new SpiderXmlConfigLoader(applicationContext), spiderMonitor());
-    }
+//    @Bean
+//    public SpiderBootstrap spiderBootstrap() {
+//        return new SpiderBootstrap(new SpiderXmlConfigLoader(applicationContext), spiderMonitor());
+//    }
 
     @Bean
     public SpiderMonitor spiderMonitor() {

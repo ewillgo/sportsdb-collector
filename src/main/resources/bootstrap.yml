@@ -1,0 +1,32 @@
+server:
+  port: 10003
+
+management:
+  context-path: "${EUREKA_MONITOR_PATH}"
+
+eureka:
+  client:
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://test:test123@10.100.17.81:10000/eureka
+  instance:
+    prefer-ip-address: true
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10
+    status-page-url-path: "${management.context-path}/info"
+    health-check-url-path: "${management.context-path}/health"
+
+spring:
+  application:
+    name: sportsdb-collector
+    index: 0
+  cloud:
+      config:
+        discovery:
+          enabled: true
+          service-id: sportsdb-config-server
+        name: "${spring.application.name}-config"
+        profile: dev
+        failFast: true
